@@ -81,8 +81,7 @@ class OrthomosaicTools():
         cv2.imwrite(out_path, im_v)
 
     def orthorectify_video(self, camera, start_time = 0, step = 1/24, clip_duration = 30):
-        #choose which camera you will be working with
-        
+        """ method for orthorecifying videos"""
 
         ortho_tools = OrthomosaicTools()
         matrix = ortho_tools.find_homoragphy(camera)
@@ -114,7 +113,7 @@ class OrthomosaicTools():
         out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
 
         while success and count <= start_time + clip_duration:
-            cap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))    # added this line 
+            cap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))    # added this line
 
             if success == True:
                 ret, frame = cap.read()
