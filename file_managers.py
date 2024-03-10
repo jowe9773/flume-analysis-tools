@@ -38,4 +38,3 @@ class FileManagers:
         filename = filedialog.askopenfilename(title = purpose)
 
         return filename
-    
