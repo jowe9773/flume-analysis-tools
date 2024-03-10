@@ -9,45 +9,62 @@ import os
 import numpy as np
 import cv2
 from file_managers import FileManagers
+from orthomosaic_tools import OrthomosaicTools
 
-#######################################
-# Step 1: find homography from points #
-#######################################
+#choose which camera you will be working with
+camera = 1
 
-cam = 1 #state which camera you are working with
+ortho_tools = OrthomosaicTools()
+matrix = ortho_tools.find_homoragphy(camera)
 
-#load gcps
+#load input video
 file_managers = FileManagers()
-gcps_rw_list, gcps_image_list = file_managers.import_gcps()
+input_video = file_managers.load_fn("Choose a video file")
 
-#add 2000 to the x coordinates of the real world list
-for count, i in enumerate(gcps_rw_list):
-    i[0] = float(i[0]) - 2438 * (cam-1)
-    i[1] = float(i[1]) + 2000
+#choose a place to store output video
+output_dn = file_managers.load_dn("Choose a directory to store corrected video in")
+fn = os.path.basename(input_video).split('.')[0]
+output_path = output_dn + '\\' + fn + "_corrected.mp4"
 
-#convert the image and destination coordinates to numpy array with float32
-src_pts = np.array(gcps_image_list)
-src_pts = np.float32(src_pts[:, np.newaxis, :])
+#select information for video
+start_time = 0
+clip_duration = 30
+step = 1/24
+count = start_time
+success = True
 
-dst_pts = np.array(gcps_rw_list)
-dst_pts = np.float32(dst_pts[:, np.newaxis, :])
+cap = cv2.VideoCapture(input_video)
 
-# Now we can find homography matrix 
-h_matrix = cv2.findHomography(src_pts, dst_pts)
+# Get the video's frames per second and frame size
+fps = cap.get(cv2.CAP_PROP_FPS)
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-#################################################
-# Step 2: load image and apply perspective warp #
-#################################################
+# Create VideoWriter object to save the output video
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
 
-#load image
-image_fn = file_managers.load_fn("Select and image to orthorectify")
-image = cv2.imread(image_fn) 
+while success and count <= start_time + clip_duration:
+    cap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))    # added this line 
 
-#create an output name in the same directory as the input
-out_image_fn = os.path.splitext(image_fn)[0] + "corrected.jpg"
+    if success == True:
+        ret, frame = cap.read()
 
-#finally warp the perspective of the image
-corrected_image = cv2.warpPerspective(image, h_matrix[0], (2438, 4000))
+        # Increase brightness using cv2.addWeighted
+        corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
 
-# Save the corrected image
-cv2.imwrite(out_image_fn, corrected_image)
+        # Write the brightened frame to the output video
+        out.write(corrected_frame)
+
+        count = count + step
+
+    # Break the loop if no more frames are available
+    else:
+        break
+
+# Release video capture and writer objects
+cap.release()
+out.release()
+
+# Close all OpenCV windows
+cv2.destroyAllWindows()
