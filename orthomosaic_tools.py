@@ -20,24 +20,8 @@ class OrthomosaicTools():
 
         file_manager = FileManagers() #create an instance of the file manager class
 
-        gcps_fn = file_manager.load_fn("GCPs file") #load filename/path of the GCPs
-
-        gcps_rw_list = [] #make list for real world coordinates of GCPs
-        gcps_image_list = [] #make list for image coordinates of GCPs
-
-        #Read csv file into a list of real world and a list of image gcp coordinates
-        with open(gcps_fn, 'r', newline='', encoding="utf-8") as csvfile:
-            # Create a CSV reader object
-            csv_reader = csv.reader(csvfile)
-
-            # Skip the header row
-            next(csv_reader)
-
-            # Iterate over each row in the CSV file
-            for row in csv_reader:
-                # Each row is a list where each element represents a column value
-                gcps_image_list.append(row[1:3])
-                gcps_rw_list.append(row[3:5])
+        file_managers = FileManagers()
+        gcps_rw_list, gcps_image_list = file_managers.import_gcps()
 
         #add 2000 to the x coordinates of the real world list
         for count, i in enumerate(gcps_rw_list):
