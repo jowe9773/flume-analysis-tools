@@ -21,7 +21,7 @@ class FileManagers:
 
         root = tk.Tk()
         root.withdraw()
-        directory_name = filedialog.askdirectory(title = purpose)   
+        directory_name = filedialog.askdirectory(title = purpose)
 
         return directory_name
 
