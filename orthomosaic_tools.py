@@ -96,9 +96,6 @@ class OrthomosaicTools():
         output_path = output_dn + '\\' + fn + "_corrected.mp4"
 
         #select information for video
-        start_time = 0
-        clip_duration = 30
-        step = 1/24
         count = start_time
         success = True
 
@@ -109,7 +106,7 @@ class OrthomosaicTools():
 
 
         # Create VideoWriter object to save the output video
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
 
         while success and count <= start_time + clip_duration:
@@ -124,7 +121,7 @@ class OrthomosaicTools():
                 # Write the brightened frame to the output video
                 out.write(corrected_frame)
 
-                count = count + step
+                count = count + (1/fps)
 
             # Break the loop if no more frames are available
             else:

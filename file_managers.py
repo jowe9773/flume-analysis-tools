@@ -49,7 +49,7 @@ class FileManagers:
         gcps_image_list = [] #make list for image coordinates of GCPs
 
         #Read csv file into a list of real world and a list of image gcp coordinates
-        with open(gcps_fn, 'r', newline='', encoding="utf-8") as csvfile:
+        with open(gcps_fn, 'r', newline='') as csvfile:
             # Create a CSV reader object
             csv_reader = csv.reader(csvfile)
 

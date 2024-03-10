@@ -57,6 +57,7 @@ while success and count <= start_time + clip_duration:
         out.write(corrected_frame)
 
         count = count + step
+        print(count)
 
     # Break the loop if no more frames are available
     else:
