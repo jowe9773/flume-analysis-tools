@@ -10,7 +10,7 @@ This file has a range of file management tools that allow GUI selection of the f
 This function opens a tkinter GUI for selecting a directory and returns the full path to the directory once selected.
 - *purpose:*  provides expanatory text in the GUI that tells the user what directory to select.
 
-#### load_fn(self, purpose):** 
+#### load_fn(self, purpose): 
 
 This function opens a tkinter GUI for selecting a directory and returns the full path to the file once selected.
-- *purpose:*  provides expanatory text in the GUI that tells the user what directory to file.
+- *purpose:*  provides expanatory text in the GUI that tells the user what file to select.
