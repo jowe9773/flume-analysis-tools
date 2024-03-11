@@ -34,20 +34,25 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-
-
+os.environ['OPENCV_FFMPEG_READ_ATTEMPTS'] = '10000'  # update ffmpeg read attempts
+fourcc = cv2.VideoWriter_fourcc(*"fdsc")
 # Create VideoWriter object to save the output video
-out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc('M', 'P','4','V'), fps, (width, height))
+out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
+print('done!')
 
 success, frame = cap.read()
+cap.set(cv2.CAP_PROP_POS_MSEC,(5000))
 while success:
+    
 
     # correct frame with warpPerspective
     corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
 
     # Write the brightened frame to the output video
     out.write(corrected_frame)
+
     success, frame = cap.read()
+    print(success)
 
 # Release video capture and writer objects
 cap.release()
