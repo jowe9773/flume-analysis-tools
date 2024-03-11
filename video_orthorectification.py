@@ -35,12 +35,12 @@ width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 os.environ['OPENCV_FFMPEG_READ_ATTEMPTS'] = '10000'  # update ffmpeg read attempts
-fourcc = cv2.VideoWriter_fourcc(*"hevc")
+fourcc = cv2.VideoWriter_fourcc(*"HEIC")
 # Create VideoWriter object to save the output video
 out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
 print('done!')
 
-START_TIME = 53000 #in milliseconds
+START_TIME = 60000 #in milliseconds
 LENGTH = 30 #in seconds
 COUNT = 0
 success, frame = cap.read()
