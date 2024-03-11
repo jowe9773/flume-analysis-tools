@@ -11,10 +11,10 @@ from file_managers import FileManagers
 from orthomosaic_tools import OrthomosaicTools
 
 #choose which camera you will be working with
-camera = 1
+CAM = 1
 
 ortho_tools = OrthomosaicTools()
-matrix = ortho_tools.find_homoragphy(camera)
+matrix = ortho_tools.find_homoragphy(CAM)
 
 #load input video
 file_managers = FileManagers()
@@ -40,10 +40,12 @@ fourcc = cv2.VideoWriter_fourcc(*"fdsc")
 out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
 print('done!')
 
+START_TIME = 53000 #in milliseconds
+LENGTH = 30 #in seconds
+COUNT = 0
 success, frame = cap.read()
-cap.set(cv2.CAP_PROP_POS_MSEC,(5000))
-while success:
-    
+cap.set(cv2.CAP_PROP_POS_MSEC,(START_TIME))
+while success and COUNT <= LENGTH:
 
     # correct frame with warpPerspective
     corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
@@ -52,7 +54,7 @@ while success:
     out.write(corrected_frame)
 
     success, frame = cap.read()
-    print(success)
+    COUNT = COUNT + 1/fps
 
 # Release video capture and writer objects
 cap.release()
