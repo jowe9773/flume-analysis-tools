@@ -6,7 +6,6 @@ broken up in the way that makes the most sense."""
 
 #Load neccesary packages and modules
 import os
-import numpy as np
 import cv2
 from file_managers import FileManagers
 from orthomosaic_tools import OrthomosaicTools
@@ -26,42 +25,29 @@ output_dn = file_managers.load_dn("Choose a directory to store corrected video i
 fn = os.path.basename(input_video).split('.')[0]
 output_path = output_dn + '\\' + fn + "_corrected.mp4"
 
-#select information for video
-start_time = 0
-clip_duration = 30
-step = 1/24
-count = start_time
-success = True
 
+
+#heres where we get into the video
 cap = cv2.VideoCapture(input_video)
 
-# Get the video's frames per second and frame size
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+
+
 # Create VideoWriter object to save the output video
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
+out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc('M', 'P','4','V'), fps, (width, height))
 
-while success and count <= start_time + clip_duration:
-    cap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))    # added this line 
+success, frame = cap.read()
+while success:
 
-    if success == True:
-        ret, frame = cap.read()
+    # correct frame with warpPerspective
+    corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
 
-        # Increase brightness using cv2.addWeighted
-        corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
-
-        # Write the brightened frame to the output video
-        out.write(corrected_frame)
-
-        count = count + step
-        print(count)
-
-    # Break the loop if no more frames are available
-    else:
-        break
+    # Write the brightened frame to the output video
+    out.write(corrected_frame)
+    success, frame = cap.read()
 
 # Release video capture and writer objects
 cap.release()
