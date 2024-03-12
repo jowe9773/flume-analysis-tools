@@ -2,6 +2,7 @@
 """module containing methods for managing files"""
 
 #import necessary packages
+import csv
 import tkinter as tk
 from tkinter import filedialog
 
@@ -38,4 +39,27 @@ class FileManagers:
         filename = filedialog.askopenfilename(title = purpose)
 
         return filename
-    
+
+    def import_gcps(self):
+        """module for importing ground control points as lists"""
+
+        gcps_fn = self.load_fn("GCPs file") #load filename/path of the GCPs
+
+        gcps_rw_list = [] #make list for real world coordinates of GCPs
+        gcps_image_list = [] #make list for image coordinates of GCPs
+
+        #Read csv file into a list of real world and a list of image gcp coordinates
+        with open(gcps_fn, 'r', newline='') as csvfile:
+            # Create a CSV reader object
+            csv_reader = csv.reader(csvfile)
+
+            # Skip the header row
+            next(csv_reader)
+
+            # Iterate over each row in the CSV file
+            for row in csv_reader:
+                # Each row is a list where each element represents a column value
+                gcps_image_list.append(row[1:3])
+                gcps_rw_list.append(row[3:5])
+
+        return gcps_rw_list, gcps_image_list
