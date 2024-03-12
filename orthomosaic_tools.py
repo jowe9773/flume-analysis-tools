@@ -14,11 +14,8 @@ class OrthomosaicTools():
     def __init__(self):
         print("initialized")
 
-    def find_homoragphy(self, cam):
+    def find_homoragphy(self, cam, gcps_rw_list, gcps_image_list):
         """Method for finding homography matrix."""
-
-        file_managers = FileManagers() #create an instance of the file manager class
-        gcps_rw_list, gcps_image_list = file_managers.import_gcps()
 
         #add 2000 to the x coordinates of the real world list
         for count, i in enumerate(gcps_rw_list):
@@ -79,52 +76,42 @@ class OrthomosaicTools():
         out_path = out_dn + "//merged.jpg"
         cv2.imwrite(out_path, im_v)
 
-    def orthorectify_video(self, camera, start_time = 0, step = 1/24, clip_duration = 30):
+    def orthorectify_video(self, cam, start_time_s, length_s, input_fn,
+                           output_dn, gcps_rw_list, gcps_image_list, final_shape = (2438,4000)):
         """ method for orthorecifying videos"""
 
-        ortho_tools = OrthomosaicTools()
-        matrix = ortho_tools.find_homoragphy(camera)
-
-        #load input video
-        file_managers = FileManagers()
-        input_video = file_managers.load_fn("Choose a video file")
+        #Find homography matrix
+        matrix = self.find_homoragphy(cam, gcps_rw_list, gcps_image_list)
 
         #choose a place to store output video
-        output_dn = file_managers.load_dn("Choose a directory to store corrected video in")
-        fn = os.path.basename(input_video).split('.')[0]
+        fn = os.path.basename(input_fn).split('.')[0]
         output_path = output_dn + '\\' + fn + "_corrected.mp4"
 
-        #select information for video
-        count = start_time
-        success = True
+        #heres where we get into the video
+        cap = cv2.VideoCapture(input_fn)
 
-        cap = cv2.VideoCapture(input_video)
-
-        # Get the video's frames per second and frame size
         fps = cap.get(cv2.CAP_PROP_FPS)
 
-
+        os.environ['OPENCV_FFMPEG_READ_ATTEMPTS'] = '10000'  # update ffmpeg read attempts
+        fourcc = cv2.VideoWriter_fourcc(*"HEIC")
         # Create VideoWriter object to save the output video
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (2438, 4000))
+        out = cv2.VideoWriter(output_path, fourcc, fps, final_shape)
+        print('done!')
 
-        while success and count <= start_time + clip_duration:
-            cap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))    # added this line
+        start_time = start_time_s *1000
+        count = 0
+        success, frame = cap.read()
+        cap.set(cv2.CAP_PROP_POS_MSEC,(start_time))
+        while success and count <= length_s:
 
-            if success == True:
-                ret, frame = cap.read()
+            # correct frame with warpPerspective
+            corrected_frame = cv2.warpPerspective(frame, matrix, final_shape)
 
-                # Increase brightness using cv2.addWeighted
-                corrected_frame = cv2.warpPerspective(frame, matrix, (2438, 4000))
+            # Write the brightened frame to the output video
+            out.write(corrected_frame)
 
-                # Write the brightened frame to the output video
-                out.write(corrected_frame)
-
-                count = count + (1/fps)
-
-            # Break the loop if no more frames are available
-            else:
-                break
+            success, frame = cap.read()
+            count = count + 1/fps
 
         # Release video capture and writer objects
         cap.release()
