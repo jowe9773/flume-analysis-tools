@@ -1,4 +1,5 @@
 #video_orthorectification.py
+"""script for orthorecifying a video"""
 
 #load neccesary packages and modules
 from orthomosaic_tools import OrthomosaicTools
