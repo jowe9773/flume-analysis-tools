@@ -3,7 +3,6 @@
 """module containing methods used in orthorectification and mosaicing of photos and videos"""
 
 #Load neccesary packages and modules
-import csv
 import os
 import numpy as np
 import cv2
