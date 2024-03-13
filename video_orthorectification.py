@@ -13,10 +13,10 @@ fm = FileManagers()
 in_vid = fm.load_fn("select video you wish to orthorectify")
 
 #select GCPs file
-gcps_rw_list, gcps_image_list = fm.import_gcps()
+gcps = fm.import_gcps()
 
 #choose camera, start time (seconds) and length (seconds)
-CAM = 1
+CAM = 4
 START_TIME = 2
 LENGTH = 10
 
@@ -28,5 +28,4 @@ ot.orthorectify_video(cam=CAM,
                       length_s=LENGTH,
                       input_fn=in_vid,
                       output_dn=out_dn,
-                      gcps_rw_list=gcps_rw_list,
-                      gcps_image_list=gcps_image_list)
+                      gcps = gcps)

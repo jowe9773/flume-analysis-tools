@@ -3,8 +3,11 @@
 
 #import necessary packages
 import csv
+import json
+import skvideo.io
 import tkinter as tk
 from tkinter import filedialog
+
 
 class FileManagers:
     """Class contains methods for managing files"""
@@ -62,4 +65,13 @@ class FileManagers:
                 gcps_image_list.append(row[1:3])
                 gcps_rw_list.append(row[3:5])
 
-        return gcps_rw_list, gcps_image_list
+                gcps = [gcps_rw_list, gcps_image_list]
+
+        return gcps
+
+    def load_video_metadata(self, vid_file):
+        """This method is to load video metadata"""
+
+        metadata = skvideo.io.ffprobe(vid_file)
+
+        return metadata
