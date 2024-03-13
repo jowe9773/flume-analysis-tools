@@ -14,19 +14,19 @@ class OrthomosaicTools():
     def __init__(self):
         print("initialized")
 
-    def find_homoragphy(self, cam, gcps_rw_list, gcps_image_list):
+    def find_homography(self, cam, gcps):
         """Method for finding homography matrix."""
 
         #add 2000 to the x coordinates of the real world list
-        for count, i in enumerate(gcps_rw_list):
+        for count, i in enumerate(gcps[0]):
             i[0] = float(i[0]) - 2438 * (cam-1)
             i[1] = float(i[1]) + 2000
 
         #convert the image and destination coordinates to numpy array with float32
-        src_pts = np.array(gcps_image_list)
+        src_pts = np.array(gcps[1])
         src_pts = np.float32(src_pts[:, np.newaxis, :])
 
-        dst_pts = np.array(gcps_rw_list)
+        dst_pts = np.array(gcps[0])
         dst_pts = np.float32(dst_pts[:, np.newaxis, :])
 
         #now we can find homography matrix
@@ -46,7 +46,7 @@ class OrthomosaicTools():
         warped_image = cv2.warpPerspective(image, matrix, (2438, 4000))
 
         # Save the warped image (if input = True)
-        if save_image == True:
+        if save_image is True:
             cv2.imwrite(out_image_fn, warped_image)
 
         else:
@@ -77,11 +77,11 @@ class OrthomosaicTools():
         cv2.imwrite(out_path, im_v)
 
     def orthorectify_video(self, cam, start_time_s, length_s, input_fn,
-                           output_dn, gcps_rw_list, gcps_image_list, final_shape = (2438,4000)):
+                           output_dn, gcps, final_shape = (2438,4000)):
         """ method for orthorecifying videos"""
 
         #Find homography matrix
-        matrix = self.find_homoragphy(cam, gcps_rw_list, gcps_image_list)
+        matrix = self.find_homography(cam, gcps)
 
         #choose a place to store output video
         fn = os.path.basename(input_fn).split('.')[0]
