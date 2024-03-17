@@ -28,3 +28,17 @@ This function finds a homography matrix based on ground control points. Has a "c
 This function applies a homography matrix to an image to warp the image perspective to rectilinear. returns an image.
 - *matrix:* homography matrix. Can be found for a particular image with a set of ground control points using OrthomoseaicTools.find_homography().
 - *save_image:* (default = True) If you would like to save the image as a file, this parameter should be set to true.
+
+#### hmerge_images(self, image_list):
+This function concatenates images horizontally. **All images being merge must be the same height.** In order to add images together cleanly, the images must be cut so that one image ends exactly where the next image is going to start. 
+-*image_list:* a list of cv2 images. Second image in the list is appended to the right of the first image, and further images are appended to the right. 
+
+#### vmerge_images(self, image_list):
+This function concatenates images vertically. **All images being merge must be the same width.** In order to add images together cleanly, the images must be cut so that one image ends exactly where the next image is going to start. 
+-*image_list:* a list of cv2 images. Second image in the list is appended to the bottom of the first image, and further images are appended to the bottom. 
+
+####orthorectify_video(self, cam, start_time_s, length_s, input_fn, output_dn, gcps, final_shape = (2438, 4000)):
+This function orthorectifies a video stream. This will only work if the camera is not moving. This will output a new video file with the orthorectified video. 
+- *cam:* what camera does the video stream come from
+- *start_time_s:* what time into the video would you like to begin orthorectifying
+- 
