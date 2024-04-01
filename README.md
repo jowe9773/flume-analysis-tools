@@ -75,4 +75,6 @@ This file accesses the neccesary modules and functions to orthorectify a single 
 ## merge_videos.py
 This file accesses the neccesary modules and functions to orthorectify and merge multiple videos. To run, simply edit the neccesary parameters (lines 34-43 and 47) to reflect the situation and run the script. Several file managers will pop up to allow you to select the input video files, ground control points files, and directory where you would like to store the final video. 
 
+**Note: the codec (fourcc) is likely to fail and give you a warning. This is not an issue because the program will switch and use the correct encoder. 
+
 --------------------------------------------------------------------------------------------
