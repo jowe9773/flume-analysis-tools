@@ -31,11 +31,20 @@ print(videos)
 gcps_list = [gcps, gcps1, gcps2, gcps3]
 print(gcps_list)
 
+#time offsets between the videos (in ms)
 offsets = [0, 1400, -1000, 5100]
 
-#output_path = fm.load_dn("Choose a directory to store video in")
+#choose start time for first video and length to process
+start = 15
+length = 3
 
-output_path = 'C:/Users/josie/OneDrive/Desktop/GoPro Video Test/'
-outn = "winter_PIV_video_no_wood"
+#choose compression and output speed
+compress = 5
+speed = 1
 
-ot.orthomosaic_video(videos, gcps_list, offsets, output_path, outn, start_time_s = 15, length_s = 90, compress_by = 5, out_speed = 1)
+#output video file information
+output_path = fm.load_dn("Choose a directory to store video in")
+outn = "test1"
+
+#run function!
+ot.orthomosaic_video(videos, gcps_list, offsets, output_path, outn, start_time_s = start, length_s = length, compress_by = compress, out_speed = speed)

@@ -28,7 +28,6 @@ This function loads metadata for a video file into memory.
 This file has a range of tools that are used to orthorectify and mosiac images and videos.
 
 #### find_homography(self, cam, gcps): 
-
 This function finds a homography matrix based on ground control points. Has a "cam" option to shift the image to the proper place. Returns a homography matrix
 - *cam:*  what camera are the gcps from.
 - *gcps:* ground control points (a list of lists. list 1 is ground control coordinates in the image, list 2 is ground control coordinates in the real world). Use output from FileManagers.import_gcps() for a given camera. 
@@ -54,6 +53,28 @@ This function orthorectifies a video stream. This will only work if the camera i
 - *input_fn:* name of the video file to be orthorectified
 - *output_dn:* directory in which the orthorectified video will be stored
 - *gcps:* ground control points file for the camera
-- *final_shape:* (default = (2438, 4000)) of the final output video. This allows cropping of the image
+- *final_shape:* (default = (2438, 4000)) Shape of the final output video. This allows cropping of the video.
 
+#### orthomosaic_video(videos, gcps_list, offsets_list, output_dn, outname, start_time_s, length_s, compress_by, out_speed, final_shape = (2438,4000)):
+This function orthorectifies multiple videos and horizontally concatenates them to make a single orthomosaiced photo.
+- *gcps_list:* A list containing the ground control points for each camera in order (length = number of cameras).
+- *offsets_list:* A list containing the time offsets for each video (length = number of cameras).
+- *output_dn:* The directory where you would like to store the output video.
+- *outname:* The name of the final output file.
+- *start_time_s:* Time where you would like to start processing for the first video feed (in seconds) **NOTE: always start after 5 seconds because there is an internal cv2 bug that sometimes trips in the first few seconds. 
+- *length_s:* Length of time that you want to process (in seconds).
+- *compress_by:* An integer by which the output video is compressed by **NOTE: the final image for the Riverine Basin would be 9750 x 4000 pixels, which is too large for the program to handle, so this value must be 2 or greater.
+- *out_speed:* An number by which the output video is sped up by. Using 1 for this value would be real time, 2 would be sped up by 2, so that 2x the frames occur in each second. 
+- *final_shape:* (default = 2438, 4000) Shape of the final output video. This allows cropping of the video. Default is what I am using for the Riverine Basin.
 
+--------------------------------------------------------------------------------------------
+## video_orthorectification.py
+This file accesses the neccesary modules and functions to orthorectify a single video. To run, simply edit the neccesary parameters (lines 19-21) to reflect the situation and run the script. Several file managers will pop up to allow you to select the input video file, ground control points file, and directory where you would like to store the final video. 
+
+--------------------------------------------------------------------------------------------
+## merge_videos.py
+This file accesses the neccesary modules and functions to orthorectify and merge multiple videos. To run, simply edit the neccesary parameters (lines 34-43 and 47) to reflect the situation and run the script. Several file managers will pop up to allow you to select the input video files, ground control points files, and directory where you would like to store the final video. 
+
+**Note: the codec (fourcc) is likely to fail and give you a warning. This is not an issue because the program will switch and use the correct encoder. 
+
+--------------------------------------------------------------------------------------------

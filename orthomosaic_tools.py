@@ -17,7 +17,7 @@ class OrthomosaicTools():
     def find_homography(self, cam, gcps):
         """Method for finding homography matrix."""
 
-        #add 2000 to the x coordinates of the real world list
+        #adjust the ground control points so that they are within the frame of the camera, which starts at (0,0) for each camera
         for count, i in enumerate(gcps[0]):
             i[0] = float(i[0]) - 2438 * (cam-1)
             i[1] = float(i[1]) + 2000
@@ -37,13 +37,18 @@ class OrthomosaicTools():
     def orthorectify_image(self, matrix, save_image = False):
         """Method for orthorectifying individual images."""
 
+        #instantiate the file managers class
+        fm = FileManagers()
+
         #load image file
-        file_manager = FileManagers()
-        image_fn = file_manager.load_fn("Select and image to orthorectify")
-        out_image_fn = os.path.splitext(image_fn)[0] + "_warped.jpg"
+        image_fn = fm.load_fn("Select and image to orthorectify")
         image = cv2.imread(image_fn)
 
-        warped_image = cv2.warpPerspective(image, matrix, (2438, 4000))
+        #create output filepath
+        out_image_fn = os.path.splitext(image_fn)[0] + "_warped.jpg"
+
+        #transform image based on the input matrix
+        warped_image = cv2.warpPerspective(image, matrix, (2438, 4000)) #tuple is final image extent starting at top right corner
 
         # Save the warped image (if input = True)
         if save_image is True:
@@ -55,6 +60,7 @@ class OrthomosaicTools():
     def hmerge_images(self, image_list):
         """horizontally merge images of same vertical size"""
 
+        #horizontally merge images
         im_h = cv2.hconcat(image_list)
 
         # save the output image
@@ -67,6 +73,7 @@ class OrthomosaicTools():
     def vmerge_images(self, image_list):
         """vertically merge images of same vertical size"""
 
+        #vertically merge images
         im_v = cv2.vconcat(image_list)
 
         # save the output image
@@ -87,21 +94,25 @@ class OrthomosaicTools():
         fn = os.path.basename(input_fn).split('.')[0]
         output_path = output_dn + '\\' + fn + "_corrected.mp4"
 
-        #heres where we get into the video
+        #create a video capture of the input video
         cap = cv2.VideoCapture(input_fn)
 
+        #find frame rate of the video
         fps = cap.get(cv2.CAP_PROP_FPS)
 
+
         os.environ['OPENCV_FFMPEG_READ_ATTEMPTS'] = '10000'  # update ffmpeg read attempts
-        fourcc = cv2.VideoWriter_fourcc(*"HEIC")
+        fourcc = cv2.VideoWriter_fourcc(*"HEIC") #choose a fourcc to encode video as
+
         # Create VideoWriter object to save the output video
         out = cv2.VideoWriter(output_path, fourcc, fps, final_shape)
-        print('done!')
 
+        #set up start time and counter to point to where to start and when to end 
         start_time = start_time_s *1000
         count = 0
         success, frame = cap.read()
         cap.set(cv2.CAP_PROP_POS_MSEC,(start_time))
+
         while success and count <= length_s:
 
             # correct frame with warpPerspective
@@ -132,33 +143,38 @@ class OrthomosaicTools():
         #choose a place to store output video
         output_fn = output_dn + "\\" + outname + ".mp4"
 
-        #Find homography matrix
+        #Find homography matricies for each camera
         matrix = ot.find_homography(1, gcps_list[0])
         matrix1 = ot.find_homography(2, gcps_list[1])
         matrix2 = ot.find_homography(3, gcps_list[2])
         matrix3 = ot.find_homography(4, gcps_list[3])
 
-        #heres where we get into the video
+        #create a capture object for each video
         cap = cv2.VideoCapture(videos[0])
         cap1 = cv2.VideoCapture(videos[1])
         cap2 = cv2.VideoCapture(videos[2])
         cap3 = cv2.VideoCapture(videos[3])
 
+        #find frame rate of first video
         fps = cap.get(cv2.CAP_PROP_FPS)
 
+        #select a fourcc to encode the video as
         fourcc = cv2.VideoWriter_fourcc(*"HEIC")
+
         # Create VideoWriter object to save the output video
         out = cv2.VideoWriter(output_fn, fourcc, fps*out_speed, output_shape)
-        print('done!')
 
+        #set up start time and count to point to where to start and when to end processing
         start_time = start_time_s *1000
         count = 0
 
+        #start reading frames
         ret, frame = cap.read()
         ret1, frame1 = cap1.read()
         ret2, frame2 = cap2.read()
         ret3, frame3 = cap3.read()
 
+        #set start time for each video (with time offset to align videos in time)
         cap.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[0]))
         cap1.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[1]))
         cap2.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[2]))
@@ -175,9 +191,13 @@ class OrthomosaicTools():
             corrected_frame3 = cv2.warpPerspective(frame3, matrix3, final_shape)
             corrected_frame3 = cv2.resize(corrected_frame3, compressed_shape)
 
+            #merge corrected frames
             merged = cv2.hconcat([corrected_frame, corrected_frame1, corrected_frame2, corrected_frame3])
+
+            #write the merged frame to new video
             out.write(merged)
 
+            #move to next frame
             ret, frame = cap.read()
             ret1, frame1 = cap1.read()
             ret2, frame2 = cap2.read()

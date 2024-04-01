@@ -3,7 +3,6 @@
 
 #import necessary packages
 import csv
-import json
 import skvideo.io
 import tkinter as tk
 from tkinter import filedialog
