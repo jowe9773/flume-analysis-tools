@@ -119,3 +119,76 @@ class OrthomosaicTools():
 
         # Close all OpenCV windows
         cv2.destroyAllWindows()
+
+    def orthomosaic_video(self, videos, gcps_list, offsets_list, output_dn, outname, start_time_s, length_s, compress_by, out_speed, final_shape = (2438,4000)):
+        """ method for orthorecifying videos"""
+
+        compressed_shape = tuple([int(s / compress_by) for s in final_shape])
+        output_shape = (int(4 * compressed_shape[0]), compressed_shape[1])
+
+        #instantiate the orthomosaic tools module
+        ot = OrthomosaicTools()
+
+        #choose a place to store output video
+        output_fn = output_dn + "\\" + outname + ".mp4"
+
+        #Find homography matrix
+        matrix = ot.find_homography(1, gcps_list[0])
+        matrix1 = ot.find_homography(2, gcps_list[1])
+        matrix2 = ot.find_homography(3, gcps_list[2])
+        matrix3 = ot.find_homography(4, gcps_list[3])
+
+        #heres where we get into the video
+        cap = cv2.VideoCapture(videos[0])
+        cap1 = cv2.VideoCapture(videos[1])
+        cap2 = cv2.VideoCapture(videos[2])
+        cap3 = cv2.VideoCapture(videos[3])
+
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        fourcc = cv2.VideoWriter_fourcc(*"HEIC")
+        # Create VideoWriter object to save the output video
+        out = cv2.VideoWriter(output_fn, fourcc, fps*out_speed, output_shape)
+        print('done!')
+
+        start_time = start_time_s *1000
+        count = 0
+
+        ret, frame = cap.read()
+        ret1, frame1 = cap1.read()
+        ret2, frame2 = cap2.read()
+        ret3, frame3 = cap3.read()
+
+        cap.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[0]))
+        cap1.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[1]))
+        cap2.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[2]))
+        cap3.set(cv2.CAP_PROP_POS_MSEC,(start_time + offsets_list[3]))
+
+        while ret and ret1 and ret2 and ret3 and count <= length_s:
+            # correct frames with warpPerspective
+            corrected_frame = cv2.warpPerspective(frame, matrix, final_shape)
+            corrected_frame = cv2.resize(corrected_frame, compressed_shape)
+            corrected_frame1 = cv2.warpPerspective(frame1, matrix1, final_shape)
+            corrected_frame1 = cv2.resize(corrected_frame1, compressed_shape)
+            corrected_frame2 = cv2.warpPerspective(frame2, matrix2, final_shape)
+            corrected_frame2 = cv2.resize(corrected_frame2, compressed_shape)
+            corrected_frame3 = cv2.warpPerspective(frame3, matrix3, final_shape)
+            corrected_frame3 = cv2.resize(corrected_frame3, compressed_shape)
+
+            merged = cv2.hconcat([corrected_frame, corrected_frame1, corrected_frame2, corrected_frame3])
+            out.write(merged)
+
+            ret, frame = cap.read()
+            ret1, frame1 = cap1.read()
+            ret2, frame2 = cap2.read()
+            ret3, frame3 = cap3.read()
+
+            count = count + 1/fps
+            print(cap.get(cv2.CAP_PROP_POS_MSEC))
+
+        # Release video capture and writer objects
+        cap.release()
+        out.release()
+
+        # Close all OpenCV windows
+        cv2.destroyAllWindows()
