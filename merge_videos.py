@@ -36,7 +36,7 @@ offsets = [0, 1400, -1000, 5100]
 
 #choose start time for first video and length to process
 start = 15
-length = 90
+length = 3
 
 #choose compression and output speed
 compress = 5
@@ -44,7 +44,7 @@ speed = 1
 
 #output video file information
 output_path = fm.load_dn("Choose a directory to store video in")
-outn = "winter_PIV_video_no_wood"
+outn = "test1"
 
 #run function!
 ot.orthomosaic_video(videos, gcps_list, offsets, output_path, outn, start_time_s = start, length_s = length, compress_by = compress, out_speed = speed)
