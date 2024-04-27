@@ -14,27 +14,10 @@ topo_raw = load_sick_file()
 #select_topo_points(topo_raw)
 
 #interpolate nan values
-#interpolated = interpolate_nans(topo_raw)
-
-#select_topo_points(interpolated)
-
-#choosing a file to compare to (dry floodplain)
-initial_topo = load_sick_file()
-
-#view the initial topo
-#select_topo_points(initial_topo)
-
-difference = topo_raw - initial_topo
+interpolated = interpolate_nans(topo_raw)
 
 #view the difference map
-#select_topo_points(difference, colors='seismic')
-
-wood = single_out_wood(difference, 6.0)
-
-#view the difference map
-select_topo_points(wood, colors = 'YlOrBr')
-
-
+select_topo_points(interpolated, colors = 'YlOrBr')
 
 #save data
-save_jpeg(wood)
+save_jpeg(interpolated)

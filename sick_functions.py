@@ -108,6 +108,8 @@ def interpolate_nans(arr):
     print("Original array:\n", arr)
     print("\nArray with NaNs interpolated:\n", arr_interpolated)
 
+    return(arr_interpolated)
+
 def single_out_wood(topo, min_difference):
     import numpy as np
 
@@ -152,7 +154,7 @@ def save_jpeg(topo):
 
     file_path = filedialog.asksaveasfilename()
 
-    #Exporting a np array as a jpeg
+    #Exporting a np array as a tiff
     from PIL import Image
-    im = Image.fromarray(np.uint8(topo))
-    im.save(file_path)
+    im = Image.fromarray(np.uint16(topo))
+    im.save(file_path + ".tiff")
