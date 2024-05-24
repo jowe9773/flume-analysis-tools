@@ -11,7 +11,7 @@ topo_raw = load_sick_file()
 
 
 #view the raw topo
-#select_topo_points(topo_raw)
+select_topo_points(topo_raw)
 
 #interpolate nan values
 interpolated = interpolate_nans(topo_raw)
