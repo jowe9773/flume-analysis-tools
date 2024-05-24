@@ -15,8 +15,7 @@ def load_sick_file():
 
     file_path = filedialog.askopenfilename()
     
-
-    #gather values from the filename 
+    #gather values from the filename
     low_x = float(file_path[-54:-46])
     high_x = float(file_path[-31:-23])
     dx = float(file_path[-71:-66])
@@ -87,28 +86,6 @@ def select_topo_points(topo, colors = 'terrain'):
     
     ax = plt.show()
 
-def interpolate_nans(arr):
-    import numpy as np
-    from scipy import interpolate
-
-    # Create grid coordinates
-    rows, cols = np.indices(arr.shape)
-    coords = np.column_stack((rows.flatten(), cols.flatten()))
-
-    # Identify non-NaN values and their coordinates
-    non_nan_coords = coords[~np.isnan(arr).flatten()]
-    non_nan_values = arr[~np.isnan(arr)]
-
-    # Interpolate NaN values using griddata
-    interpolated_values = interpolate.griddata(non_nan_coords, non_nan_values, coords, method='linear')
-
-    # Reshape the interpolated values to match the original array shape
-    arr_interpolated = interpolated_values.reshape(arr.shape)
-
-    print("Original array:\n", arr)
-    print("\nArray with NaNs interpolated:\n", arr_interpolated)
-
-    return(arr_interpolated)
 
 def single_out_wood(topo, min_difference):
     import numpy as np
